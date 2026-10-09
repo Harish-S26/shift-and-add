@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shift-and-Add Multiplier Worksheet</title>
+<style>
+:root{--bg:#f1ece0;--card:#fffdf7;--line:#cfc6b0;--tx:#1c2433;--mut:#6b6a60;--a1:#0b4f8a;--a2:#d1451b;--bad:#b3261e;
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:Georgia,"Iowan Old Style","Palatino Linotype",serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--sans);line-height:1.5;
+background-image:linear-gradient(rgba(11,79,138,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(11,79,138,.09) 1px,transparent 1px);background-size:24px 24px;background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0;background:none;pointer-events:none;z-index:-1}
+main{max-width:1040px;margin:0 auto;padding:20px 16px 48px}
+header{padding:28px 0 12px}
+.tag{font-family:var(--mono);color:var(--a1);font-size:12px;letter-spacing:.2em}
+h1{margin:6px 0;font-size:clamp(28px,5.5vw,46px);font-style:italic;font-weight:400}
+h1 span{color:var(--a1)}
+h2{font-family:var(--mono);font-size:13px;letter-spacing:.1em;border-bottom:1.5px solid var(--a1);padding-bottom:6px;color:var(--a1);margin:0 0 14px}
+header p{color:var(--mut);max-width:620px;margin:0}
+.card{background:var(--card);border:1.5px solid #8a8672;border-radius:2px;box-shadow:5px 5px 0 var(--line);padding:18px;margin-top:18px}
+.row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+label{display:block;font-size:12px;color:var(--mut);font-family:var(--mono);margin-bottom:4px}
+input{width:110px;background:#fffdf7;color:var(--tx);border:1px solid var(--line);border-radius:2px;padding:9px 10px;font:600 18px var(--mono)}
+input:focus{outline:2px solid var(--a1);outline-offset:1px}
+input.bad{border-color:var(--bad)}
+.bin{font-family:var(--mono);color:var(--a2);font-size:15px;margin-top:4px;min-height:22px}
+.err{color:var(--bad);font-size:13px;min-height:20px;margin-top:8px;font-family:var(--mono)}
+.times{font-size:26px;color:var(--mut);padding-bottom:30px}
+button{font:600 13px var(--mono);letter-spacing:.06em;background:#fffdf7;color:var(--tx);border:1px solid var(--line);border-radius:2px;padding:10px 14px;cursor:pointer;transition:.15s}
+button:hover:not(:disabled){border-color:var(--a1);color:var(--a1)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.pri{box-shadow:2px 2px 0 var(--a2);background:var(--a1);color:#fff;border-color:var(--a1)}
+button.pri:hover:not(:disabled){color:#fff;filter:brightness(1.1)}
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.presets span,.ctl span{font:12px var(--mono);color:var(--mut)}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.status{margin-top:12px;padding:12px 14px;border-left:3px solid var(--a1);background:#fffdf7;border-radius:4px;font-family:var(--mono);font-size:14px}
+.status b{color:var(--a1)}.status .no{color:var(--a2)}
+.status small{display:block;color:var(--mut);margin-top:4px;font-size:12px}
+.badge{display:inline-block;padding:1px 8px;border-radius:4px;font-size:12px;border:1px solid currentColor;margin-right:6px}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:var(--mono)}
+.box{fill:#fffdf7;stroke:#8a8672;stroke-width:1.5;transition:.3s}
+.box.on{stroke:var(--a1);fill:#e3eefa;filter:drop-shadow(0 0 6px rgba(11,79,138,.45))}
+.box.off{stroke:var(--a2);fill:#fbe6dc;filter:drop-shadow(0 0 6px rgba(209,69,27,.35))}
+.lbl{fill:var(--mut);font-size:11px;letter-spacing:.08em}
+.val{fill:var(--tx);font-size:19px;font-weight:700;letter-spacing:.12em}
+.val .q0{fill:var(--a2)}
+.flash{animation:fl .8s ease}
+@keyframes fl{0%{fill:var(--a1);opacity:.2}100%{fill:var(--tx);opacity:1}}
+.wire{stroke:#8a8672;stroke-width:2;fill:none;transition:.3s}
+.wire.on{stroke:var(--a1);stroke-dasharray:6 5;animation:dash .6s linear infinite}
+.wire.off{stroke:var(--a2);stroke-dasharray:6 5;animation:dash .6s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-11}}
+.txt{fill:var(--a1);font-size:12px;font-weight:700}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:14px;min-width:560px}
+th{color:var(--mut);font-size:11px;letter-spacing:.1em;text-align:left;padding:8px;border-bottom:1px solid var(--line)}
+td{padding:9px 8px;border-bottom:1px solid #e6dfcc;letter-spacing:.08em}
+tr.cur td{background:#e3eefa;color:var(--a1)}
+tr.fut td{opacity:.3}
+pre{margin:0;font:600 clamp(14px,4vw,20px) var(--mono);color:var(--tx);line-height:1.5;overflow-x:auto}
+pre .dim{opacity:.22}pre .hi{color:var(--a1)}pre .pr{color:var(--a2)}
+.result{display:none;text-align:center;border:1px solid var(--a1);box-shadow:0 0 24px rgba(11,79,138,.18)}
+.result.show{display:block;animation:pop .5s ease}
+@keyframes pop{from{transform:scale(.97);opacity:0}}
+.result .t{font-family:var(--mono);letter-spacing:.25em;color:var(--a1);font-size:13px}
+.result .e{font:700 clamp(28px,7vw,44px) var(--mono);margin:10px 0}
+.result .b{font:600 22px var(--mono);color:var(--a2);letter-spacing:.12em}
+.result .i{font:12px var(--mono);color:var(--mut);margin-top:10px;letter-spacing:.2em}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+ol,ul{margin:0;padding-left:20px;color:var(--tx)}li{margin:5px 0}
+p{margin:0 0 10px;color:#b9c9d6}code{font-family:var(--mono);color:var(--a2)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:12px 0 0;font-size:14px}
+dt{font-family:var(--mono);color:var(--a1);font-size:12px}dd{margin:0;color:#b9c9d6}
+.rca{display:grid;grid-template-columns:auto repeat(8,minmax(34px,1fr));gap:4px;font-family:var(--mono);font-size:14px;text-align:center;min-width:420px}
+.rca div{padding:6px 2px;border:1px solid var(--line);background:var(--card)}
+.rca .h{background:none;border:0;color:var(--mut);font-size:11px;text-align:left;padding:6px 6px 6px 0}
+.rca .c1{background:#fbe6dc;color:var(--a2);font-weight:700}.rca .s1{background:#e3eefa;color:var(--a1);font-weight:700}
+.chk{display:inline-flex;align-items:center;gap:6px;font:12px var(--mono);color:var(--mut);margin-left:8px;cursor:pointer}.chk input{width:auto}
+.pred{display:none;margin-top:12px;padding:12px;border:1.5px dashed var(--a2);background:#fbf3ec}.pred.show{display:block}
+.pred .r{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center}.pred input{width:170px;font-size:16px}
+#pMsg{margin-top:8px;font:13px var(--mono)}.good{color:#1f7a3d}.badc{color:var(--bad)}
+.tgrid{display:grid;grid-template-columns:repeat(16,1fr);gap:2px;max-width:420px;margin-top:12px}
+.tc{height:20px;min-width:0;padding:0;border-radius:1px;border:0}.tc.ok{background:#3b9b5c}.tc.no{background:var(--bad)}
+footer{margin-top:30px;text-align:center;color:var(--mut);font:12px var(--mono)}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div class="tag">DIGITAL LOGIC WORKSHEET · BENCH NOTES</div>
+<h1>Shift-and-<span>Add</span> Multiplier</h1>
+<p>A lab worksheet for multiplying two 4-bit numbers with nothing but an adder and shifts. Load the operands, then trace each clock cycle.</p>
+</header>
+
+<section class="card" id="inputs">
+<h2>Fig. 1 · Operands</h2>
+<div class="row">
+<div><label for="mA">MULTIPLICAND (0–15)</label><input id="mA" type="number" min="0" max="15" step="1" value="5"><div class="bin" id="bA"></div></div>
+<div class="times">×</div>
+<div><label for="mB">MULTIPLIER (0–15)</label><input id="mB" type="number" min="0" max="15" step="1" value="3"><div class="bin" id="bB"></div></div>
+</div>
+<div class="err" id="err"></div>
+<div class="presets"><span>PRESETS</span>
+<button data-a="3" data-b="7">3 × 7</button><button data-a="9" data-b="6">9 × 6</button><button data-a="12" data-b="5">12 × 5</button><button data-a="15" data-b="15">15 × 15</button></div>
+</section>
+
+<section class="card" id="sim">
+<h2>Fig. 2 · Datapath Simulator</h2>
+<svg id="dp" viewBox="0 0 800 430" role="img" aria-label="Animated multiplier datapath"></svg>
+<div class="status" id="status"></div>
+<div class="ctl">
+<button id="bReset">RESET</button><button id="bPrev">◀ PREVIOUS</button><button id="bNext" class="pri">NEXT ▶</button><button id="bRun">▶ RUN</button><label class="chk"><input type="checkbox" id="pOn"> PREDICT MODE</label>
+</div>
+<div class="pred" id="pred"><b style="font:700 12px var(--mono);color:var(--a2);letter-spacing:.1em">PREDICT BEFORE YOU STEP</b>
+<div id="pQ" style="margin-top:6px;font-size:14px"></div>
+<div class="r"><input id="pIn" placeholder="e.g. 00000101" maxlength="8" inputmode="numeric" autocomplete="off"><button id="pGo" class="pri">CHECK &amp; ADVANCE</button><span id="pScore" style="font:13px var(--mono);color:var(--mut)"></span></div>
+<div id="pMsg"></div></div>
+</section>
+
+<section class="card result" id="result"></section>
+
+<section class="card">
+<h2>Table 1 · Iteration Trace</h2>
+<div class="tw"><table><thead><tr><th>STEP</th><th>Q₀</th><th>OPERATION</th><th>ACCUMULATOR</th><th>MULTIPLICAND</th><th>MULTIPLIER</th></tr></thead><tbody id="trace"></tbody></table></div>
+</section>
+
+<section class="card">
+<h2>Fig. 3 · Binary View</h2>
+<pre id="binview"></pre>
+</section>
+
+<section class="card">
+<h2>Fig. 5 · Ripple-Carry Adder (current ADD)</h2>
+<p>Inside the adder box: eight full adders in a chain. Each one adds a bit of A, a bit of M and the carry from its right neighbour.</p>
+<div class="tw"><div class="rca" id="rca"></div></div>
+<div class="status" id="rcaNote" style="margin-top:12px"></div>
+</section>
+
+<div class="grid2">
+<section class="card">
+<h2>Notes 1 · How Shift-and-Add Works</h2>
+<ol>
+<li>Initialize accumulator <code>A = 0</code></li>
+<li>Check the multiplier LSB (<code>Q₀</code>)</li>
+<li>If <code>Q₀ = 1</code>, add the multiplicand: <code>A = A + M</code></li>
+<li>Shift multiplicand left (<code>M ← M &lt;&lt; 1</code>)</li>
+<li>Shift multiplier right (<code>Q ← Q &gt;&gt; 1</code>)</li>
+<li>Repeat for every multiplier bit</li>
+<li>Display the product in <code>A</code></li>
+</ol>
+</section>
+<section class="card">
+<h2>Notes 2 · Why Shift-and-Add?</h2>
+<p>Binary multiplication is long multiplication with only two digits. Each multiplier bit is either 1 (add the multiplicand, shifted to that bit's position) or 0 (add nothing).</p>
+<p>Shifting the multiplicand left doubles it each cycle, so bit <i>i</i> contributes <code>M × 2<sup>i</sup></code>. An n-bit multiplier needs <b>n iterations</b> in the basic algorithm: 4 bits, 4 cycles. The product needs up to 2n bits: 8 here.</p>
+</section>
+</div>
+
+<section class="card">
+<h2>Fig. 4 · Datapath Architecture</h2>
+<svg viewBox="0 0 800 330" role="img" aria-label="Architecture diagram">
+<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#0b4f8a"/></marker></defs>
+<g fill="none" stroke="#0b4f8a" stroke-width="2" marker-end="url(#ar)">
+<path d="M170 70V150"/><path d="M110 280V190H130"/><path d="M230 210V260" /><path d="M570 70V120"/><path d="M540 175L400 175" stroke="#d1451b" marker-end="url(#ar2)"/><path d="M600 160L690 210" stroke="#d1451b"/><path d="M540 160L470 210" stroke="#0b4f8a"/><path d="M470 240L300 190" stroke="#0b4f8a" stroke-dasharray="5 4"/>
+</g>
+<g font-family="monospace" font-size="13" text-anchor="middle" fill="#1c2433">
+<g fill="#fffdf7" stroke="#8a8672" stroke-width="1.5">
+<rect x="60" y="20" width="220" height="50" rx="6"/><rect x="130" y="150" width="200" height="50" rx="6" stroke="#0b4f8a"/><rect x="40" y="260" width="240" height="50" rx="6"/><rect x="470" y="20" width="200" height="50" rx="6"/><rect x="520" y="120" width="100" height="50" rx="25" stroke="#d1451b"/><rect x="420" y="210" width="100" height="40" rx="6"/><rect x="640" y="210" width="110" height="40" rx="6" stroke="#d1451b"/><rect x="640" y="20" width="130" height="50" rx="6" opacity="0"/><rect x="520" y="270" width="150" height="40" rx="6"/>
+</g>
+<text x="170" y="42">MULTIPLICAND REG</text><text x="170" y="60" fill="#6b6a60" font-size="11">M · 8-bit, shifts left</text>
+<text x="230" y="172">ADDER</text><text x="230" y="190" fill="#6b6a60" font-size="11">A + M</text>
+<text x="160" y="282">ACCUMULATOR</text><text x="160" y="300" fill="#6b6a60" font-size="11">A · 8-bit result</text>
+<text x="570" y="42">MULTIPLIER REG</text><text x="570" y="60" fill="#6b6a60" font-size="11">Q · 4-bit, shifts right</text>
+<text x="570" y="150" fill="#d1451b" font-weight="700">Q₀</text>
+<text x="470" y="235">ADD</text><text x="695" y="235" fill="#d1451b">NO ADD</text>
+<text x="595" y="295">COUNTER (0→4)</text>
+<text x="500" y="270" fill="#6b6a60" font-size="11">Q₀=1</text><text x="685" y="270" fill="#6b6a60" font-size="11">Q₀=0</text>
+</g>
+</svg>
+<dl>
+<dt>MULTIPLICAND</dt><dd>Holds M; shifted left each cycle so it lines up with the next multiplier bit.</dd>
+<dt>MULTIPLIER</dt><dd>Holds Q; shifted right so the next bit appears at Q₀.</dd>
+<dt>ACCUMULATOR</dt><dd>Collects partial products; holds the final 8-bit product.</dd>
+<dt>ADDER</dt><dd>Computes A + M when enabled.</dd>
+<dt>Q₀</dt><dd>The control bit: 1 enables the add, 0 skips it.</dd>
+<dt>COUNTER</dt><dd>Counts iterations; stops after 4.</dd>
+</dl>
+</section>
+<section class="card">
+<h2>Table 2 · Self-Test: All 256 Input Pairs</h2>
+<p>Runs the shift-and-add routine for every multiplicand × multiplier pair and compares each result with ordinary multiplication.</p>
+<button id="tRun" class="pri">RUN ALL 256 TESTS</button>
+<div class="status" id="tRes" style="display:none"></div>
+<div class="tgrid" id="tGrid"></div>
+<p style="font:11px var(--mono);color:var(--mut);margin-top:6px">Rows = multiplicand 0–15, columns = multiplier 0–15. Click a cell to load that pair.</p>
+</section>
+<footer>Shift-and-Add Multiplier · Computer Organization activity</footer>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const b8=n=>n.toString(2).padStart(8,'0'), b4=n=>n.toString(2).padStart(4,'0');
+let S=[],step=0,a=5,b=3,prev=null,timer=null,valid=true;
+
+function simulate(a,b){
+  let A=0,M=a,Q=b;const s=[{A,M,Q,c:0}];
+  for(let i=0;i<4;i++){
+    const q0=Q&1,pA=A,pM=M,pQ=Q;
+    if(q0)A=(A+M)&255;
+    M=(M<<1)&255;Q>>=1;
+    s.push({A,M,Q,c:i+1,q0,add:q0===1,pA,pM,pQ});
+  }
+  return s;
+}
+function parse(v){return /^\d+$/.test(v.trim())&&+v>=0&&+v<=15?+v:null}
+function readInputs(){
+  const x=parse($('mA').value),y=parse($('mB').value);
+  $('mA').classList.toggle('bad',x===null);$('mB').classList.toggle('bad',y===null);
+  $('bA').textContent=x===null?'—':`${x} → ${b4(x)}₂`;
+  $('bB').textContent=y===null?'—':`${y} → ${b4(y)}₂`;
+  const msg=[];
+  if(x===null)msg.push('Multiplicand must be a whole number from 0 to 15.');
+  if(y===null)msg.push('Multiplier must be a whole number from 0 to 15.');
+  $('err').textContent=msg.join(' ');
+  valid=msg.length===0;
+  if(valid){a=x;b=y}
+  return valid;
+}
+function reset(){stop();sc=tot=0;$('pMsg').textContent='';readInputs();if(valid){S=simulate(a,b)}step=0;prev=null;render()}
+function stop(){if(timer){clearInterval(timer);timer=null}$('bRun').textContent='▶ RUN'}
+function next(){if(valid&&step<4){step++;render()}else stop()}
+function prevStep(){stop();if(valid&&step>0){step--;render()}}
+function run(){
+  if(timer){stop();return}
+  if(step>=4){step=0;prev=null;render()}
+  $('bRun').textContent='❚❚ PAUSE';
+  timer=setInterval(()=>{next()},1100);
+  next();
+}
+
+function reg(x,y,w,label,val,key,on,cls,q0){
+  const ch=prev&&prev[key]!==undefined&&prev[key]!==parseInt(val,2)?' flash':'';
+  let t;
+  if(q0){t=`${val.slice(0,-1)}<tspan class="q0">${val.slice(-1)}</tspan>`}else t=val;
+  return `<rect class="box ${on||''}" x="${x}" y="${y}" width="${w}" height="56" rx="6"/>
+  <text class="lbl" x="${x+10}" y="${y+16}">${label}</text>
+  <text class="val${ch}" x="${x+w/2}" y="${y+42}" text-anchor="middle">${t}</text>`;
+}
+function datapath(){
+  const s=S[step],done=step===4,run_=step>0&&!done||done&&false;
+  const act=step>0,add=act&&s.add,noadd=act&&!s.add;
+  const sh=act?'on':'';
+  const w=(d,c)=>`<path class="wire ${c||''}" d="${d}" marker-end="url(#a)"/>`;
+  let h=`<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#8a8672"/></marker></defs>`;
+  h+=w('M190 86V176',add?'on':'')+w('M110 336V216H150',add?'on':'')+w('M250 236V336',add?'on':'');
+  h+=w('M580 86V150',act?'on':'')+w('M545 205L440 250',add?'on':'')+w('M615 205L690 250',noadd?'off':'')+w('M435 270L300 220',add?'on':'');
+  h+=`<path class="wire ${act?'on':''}" d="M30 58H12" /><text class="txt" x="40" y="22" fill="#0b4f8a">◀ SHL</text><text class="txt" x="690" y="22" text-anchor="end">SHR ▶</text>`;
+  h+=reg(40,30,300,'MULTIPLICAND REG (M)',b8(s.M),'M',sh);
+  h+=reg(480,30,240,'MULTIPLIER REG (Q)',b4(s.Q),'Q',sh,'','q0'.length);
+  h+=`<rect class="box ${add?'on':''}" x="130" y="176" width="240" height="60" rx="30"/><text class="lbl" x="250" y="198" text-anchor="middle">ADDER</text><text class="val" x="250" y="224" text-anchor="middle" style="font-size:15px">${add?`${b8(s.pA)}+${b8(s.pM)}`:'A + M'}</text>`;
+  h+=reg(40,336,300,'ACCUMULATOR (A)',b8(s.A),'A',add?'on':'');
+  const q0v=act?s.q0:(S[0].Q&1);
+  h+=`<ellipse class="box ${act?'on':''}" cx="580" cy="178" rx="52" ry="28"/><text class="lbl" x="580" y="172" text-anchor="middle">Q₀ / LSB</text><text class="val" x="580" y="196" text-anchor="middle" style="fill:var(--a2)">${step<4?(act?s.pQ&1:S[0].Q&1):'—'}</text>`;
+  h+=`<rect class="box ${add?'on':''}" x="390" y="250" width="100" height="42" rx="6"/><text class="val" x="440" y="277" text-anchor="middle" style="font-size:15px">ADD</text>`;
+  h+=`<rect class="box ${noadd?'off':''}" x="640" y="250" width="120" height="42" rx="6"/><text class="val" x="700" y="277" text-anchor="middle" style="font-size:15px">NO ADD</text>`;
+  h+=`<rect class="box ${act?'on':''}" x="480" y="336" width="240" height="56" rx="6"/><text class="lbl" x="490" y="352">ITERATION COUNTER</text><text class="val${prev&&prev.c!==s.c?' flash':''}" x="600" y="381" text-anchor="middle">${s.c} / 4</text>`;
+  h+=`<text class="lbl" x="400" y="418" text-anchor="middle">${done?'COMPLETE':'M ← M<<1   ·   Q ← Q>>1   ·   COUNT ← COUNT+1'}</text>`;
+  $('dp').innerHTML=h;
+}
+function statusHtml(){
+  if(!valid)return 'Enter valid operands (0–15) to begin.';
+  const s=S[step];
+  if(step===0)return `<span class="badge">READY</span> A=00000000 · M=${b8(S[0].M)} · Q=${b4(S[0].Q)} · Count=0<small>Press NEXT or RUN to start the first iteration.</small>`;
+  const op=s.add?`<b>ADD</b></span> A = ${b8(s.pA)} + ${b8(s.pM)} = ${b8(s.A)}`:`<span class="no"><span class="badge">NO ADD</span></span>A stays ${b8(s.A)}`;
+  let h=`<b>STEP ${step} / 4</b><br>Q₀ = ${s.q0} → ${s.add?'ADD MULTIPLICAND':'NO ADD'}<br>`;
+  h+=s.add?`<span class="badge">ADD</span> A = ${b8(s.pA)} + ${b8(s.pM)} = ${b8(s.A)}`:`<span class="badge no">NO ADD</span> A stays ${b8(s.A)}`;
+  h+=`<br><span class="badge">SHIFT</span> M ${b8(s.pM)} → ${b8(s.M)} (left) · Q ${b4(s.pQ)} → ${b4(s.Q)} (right)`;
+  if(step===4)h+=`<br><span class="badge">COMPLETE</span> Product = ${b8(s.A)}₂ = ${s.A}`;
+  return h;
+}
+function traceHtml(){
+  let h=`<tr class="${step===0?'cur':''}"><td>INIT</td><td>—</td><td>LOAD</td><td>${b8(S[0].A)}</td><td>${b8(S[0].M)}</td><td>${b4(S[0].Q)}</td></tr>`;
+  for(let i=1;i<=4;i++){
+    const s=S[i],cls=i===step?'cur':i>step?'fut':'';
+    h+=`<tr class="${cls}"><td>${i} / 4</td><td>${s.q0}</td><td>${s.add?'ADD + SHIFT':'NO ADD + SHIFT'}</td><td>${b8(s.A)}</td><td>${b8(s.M)}</td><td>${b4(s.Q)}</td></tr>`;
+  }
+  return h;
+}
+function binView(){
+  const W=8+4;
+  const l=(t,c)=>`<span class="${c||''}">${t}</span>`;
+  let o=l(b4(a).padStart(W))+'\n'+l('×'+b4(b).padStart(W-1))+'\n'+l('─'.repeat(W))+'\n';
+  for(let i=0;i<4;i++){
+    const bit=(b>>i)&1,p=bit?b4(a):'0000';
+    const row=(p+' '.repeat(i)).padStart(W);
+    o+=l(row,i<step?'':'dim')+'\n';
+  }
+  o+=l('─'.repeat(W))+'\n';
+  o+=l(b8(a*b).padStart(W),step===4?'pr':'dim');
+  return o;
+}
+function render(){
+  if(!valid){
+    $('status').innerHTML=statusHtml();$('dp').innerHTML='';$('trace').innerHTML='';$('binview').innerHTML='';$('rca').innerHTML='';$('rcaNote').innerHTML='';$('pred').classList.remove('show');
+    $('result').classList.remove('show');
+    ['bReset','bPrev','bNext','bRun'].forEach(i=>$(i).disabled=i!=='bReset'&&true);
+    return;
+  }
+  datapath();
+  $('status').innerHTML=statusHtml();
+  $('trace').innerHTML=traceHtml();
+  $('binview').innerHTML=binView();rca();updPred();
+  $('bPrev').disabled=step===0;$('bNext').disabled=step===4;$('bRun').disabled=false;$('bReset').disabled=false;
+  const r=$('result');
+  if(step===4){
+    const p=S[4].A;
+    r.innerHTML=`<div class="t">COMPUTATION DONE</div><div class="e">${a} × ${b} = ${p}</div><div class="b">${b8(p)}₂</div><div class="i">4 ITERATIONS${p===a*b?' · VERIFIED':''}</div>`;
+    if(!r.classList.contains('show'))r.classList.add('show');
+    stop();
+  }else r.classList.remove('show');
+  prev={...S[step],M:S[step].M,Q:S[step].Q,A:S[step].A,c:S[step].c};
+  if(step===4)stop();
+}
+['mA','mB'].forEach(i=>$(i).addEventListener('input',reset));
+$('bReset').onclick=reset;$('bPrev').onclick=prevStep;$('bNext').onclick=onNext;$('bRun').onclick=run;
+document.querySelectorAll('[data-a]').forEach(btn=>btn.onclick=()=>{$('mA').value=btn.dataset.a;$('mB').value=btn.dataset.b;reset()});
+let sc=0,tot=0;
+function rca(){
+  const s=S[step],el=$('rca');
+  if(step===0){el.innerHTML='';$('rcaNote').innerHTML='Press NEXT to see the first addition.';return}
+  if(!s.add){el.innerHTML='';$('rcaNote').innerHTML=`<span class="badge no">NO ADD</span> Q₀ = 0 in step ${step}, so the adder is idle and A stays ${b8(s.A)}.`;return}
+  let h='<div class="h">BIT</div>',r={a:'<div class="h">A</div>',m:'<div class="h">M</div>',ci:'<div class="h">C-in</div>',sm:'<div class="h">SUM</div>',co:'<div class="h">C-out</div>'},c=0,idx='';
+  for(let i=7;i>=0;i--){h+=`<div class="h" style="text-align:center">${i}</div>`}
+  const cell={};
+  for(let i=0;i<8;i++){
+    const x=(s.pA>>i)&1,y=(s.pM>>i)&1,sum=x^y^c,co=(x&y)|(c&(x^y));
+    cell[i]={x,y,ci:c,sum,co};c=co;
+  }
+  for(let i=7;i>=0;i--){const t=cell[i];
+    r.a+=`<div>${t.x}</div>`;r.m+=`<div>${t.y}</div>`;
+    r.ci+=`<div class="${t.ci?'c1':''}">${t.ci}</div>`;
+    r.sm+=`<div class="${t.sum?'s1':''}">${t.sum}</div>`;
+    r.co+=`<div class="${t.co?'c1':''}">${t.co}</div>`;
+  }
+  $('rca').innerHTML=h+r.a+r.m+r.ci+r.sm+r.co;
+  $('rcaNote').innerHTML=`<span class="badge">ADD</span> ${b8(s.pA)} + ${b8(s.pM)} = ${b8(s.A)}. Carries ripple from bit 0 up to bit 7; the highlighted C-in cells are carries.`;
+}
+function updPred(){
+  const on=$('pOn').checked&&valid;$('pred').classList.toggle('show',on);if(!on)return;
+  const end=step>=4;
+  $('pQ').textContent=end?'Simulation complete. Press RESET to try again.':`Iteration ${step+1} of 4: what will the accumulator A be after this iteration? (8-bit binary)`;
+  $('pGo').disabled=end;$('pIn').disabled=end;
+  $('pScore').textContent=`SCORE ${sc} / ${tot}`;
+}
+function onNext(){
+  stop();
+  if($('pOn').checked&&valid&&step<4){$('pIn').focus();$('pMsg').className='badc';$('pMsg').textContent='Predict mode is on: enter your guess first, or untick it.';return}
+  next();
+}
+function checkPred(){
+  if(!valid||step>=4)return;
+  const v=$('pIn').value.trim(),m=$('pMsg');
+  if(!/^[01]{1,8}$/.test(v)){m.className='badc';m.textContent='Enter A as binary digits only (up to 8 bits).';return}
+  const right=S[step+1].A,ok=parseInt(v,2)===right;
+  tot++;if(ok)sc++;stop();next();
+  m.className=ok?'good':'badc';
+  m.textContent=ok?`Correct: A = ${b8(right)}.`:`Not quite: you guessed ${v.padStart(8,'0')}, the answer is ${b8(right)}.`;
+  $('pIn').value='';$('pScore').textContent=`SCORE ${sc} / ${tot}`;$('pIn').focus();
+}
+$('pOn').onchange=()=>{updPred();if($('pOn').checked)$('pIn').focus()};
+$('pGo').onclick=checkPred;
+$('pIn').addEventListener('keydown',e=>{if(e.key==='Enter')checkPred()});
+function runTests(){
+  let pass=0,g='',mn=99,mx=-1,sum=0;
+  for(let x=0;x<16;x++)for(let y=0;y<16;y++){
+    const t=simulate(x,y),ok=t[4].A===x*y,ad=t.filter(e=>e.add).length;
+    if(ok)pass++;mn=Math.min(mn,ad);mx=Math.max(mx,ad);sum+=ad;
+    g+=`<button class="tc ${ok?'ok':'no'}" data-a="${x}" data-b="${y}" title="${x} × ${y} = ${t[4].A} (${ok?'pass':'FAIL'})" aria-label="${x} times ${y}"></button>`;
+  }
+  $('tGrid').innerHTML=g;
+  const r=$('tRes');r.style.display='block';
+  r.innerHTML=`<b>${pass} / 256 PASSED</b>${pass===256?' · every product matches':' · some products differ'}<small>Additions per multiplication: min ${mn}, max ${mx}, average ${(sum/256).toFixed(2)}. Best case: multiplier 0 (no adds). Worst case: multiplier 15 (adds every cycle). Shifts are always 4.</small>`;
+}
+$('tRun').onclick=runTests;
+$('tGrid').addEventListener('click',e=>{const t=e.target.closest('.tc');if(!t)return;$('mA').value=t.dataset.a;$('mB').value=t.dataset.b;reset();$('sim').scrollIntoView({behavior:'smooth'})});
+reset();
+</script>
+</body>
+</html>
